@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+app.use(express.static("build"));
 app.use(express.json());
 
 // CONFIGURACION MORGAN, MIDDLEWARE
@@ -76,19 +77,21 @@ const generateId = () => {
 // PARA AGREGAR OTRA PERSONA
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-  const nameFiltered = persons.filter((person) => person.name === body.name);
 
   // Agregamos validaciones
-  if (!body.name || !body.number) {
-    return response.status(400).json({ error: "content missing" });
-  } else if (nameFiltered) {
-    return response.status(400).json({ error: "name must be unique" });
+  const personName = body.name;
+  const personNumber = body.number;
+
+  if (Object.keys(body).length === 0) {
+    return response.status(400).json({
+      error: "content missing",
+    });
   }
 
   // Al pasar la validación creamos una nueva persona
   const person = {
-    name: body.name,
-    number: body.number,
+    name: personName,
+    number: personNumber,
     id: generateId(),
   };
 
